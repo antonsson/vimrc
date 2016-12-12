@@ -11,11 +11,17 @@ call vundle#begin()
 Plugin 'gmarik/Vundle.vim'
 Plugin 'tpope/vim-fugitive'
 Plugin 'kien/ctrlp.vim'
-Plugin 'koron/minimap-vim'
+Plugin 'vim-scripts/a.vim'
+Plugin 'hsanson/vim-android'
+Plugin 'artur-shaik/vim-javacomplete2'
+Plugin 'justmao945/vim-clang'
+
+"Plugin 'Valloric/YouCompleteMe'
+"Plugin 'rdnetto/YCM-Generator'
 
 " All of your Plugins must be added before the following line
-call vundle#end()            " required
-filetype plugin indent on    " required
+call vundle#end()
+filetype plugin indent on
 
 let mapleader = ','
 color molokai
@@ -23,16 +29,18 @@ syntax on
 
 set nocompatible
 set laststatus=2
+set mouse=a
 
 " Indentation
-set tabstop=2
-set shiftwidth=2
+set tabstop=4
+set shiftwidth=4
 set expandtab
 set cindent
 " Search
 set hlsearch
 set incsearch
 set ignorecase
+
 set conceallevel=3
 set concealcursor=nivc
 
@@ -46,17 +54,38 @@ set backspace=2
 set smartcase
 set ruler
 set scrolloff=4
-set backupdir=~/.swapfiles,$TMP
-set directory=~/.swapfiles,$TMP
+set backupdir=~/.vim/swaps,$TMP
+set directory=~/.vim/swaps,$TMP
 
 " For better completion
 set completeopt=longest,menuone,preview
 
-autocmd FileType java,cpp,h setlocal shiftwidth=4 tabstop=4 expandtab
-autocmd FileType make setlocal shiftwidth=4 tabstop=4 noexpandtab
-au BufRead,BufNewFile *.logcat setfiletype logcat
+" javacomplete2
+autocmd FileType java setlocal omnifunc=javacomplete#Complete
 
-" Fix whitespace
+" Makefiles should use tabulators
+autocmd FileType make setlocal shiftwidth=4 tabstop=4 noexpandtab
+
+" Logcat syntax files
+autocmd BufRead,BufNewFile *.logcat setfiletype logcat
+
+
+" vim-android
+let g:android_sdk_path = $HOME."/sdks/android-sdk-linux"
+
+" YouCompleteMe
+"highlight YcmErrorLine cterm=none
+"highlight YcmErrorSection cterm=none
+"highlight YcmWarningLine cterm=none
+"highlight YcmWarningSection cterm=none
+
+" vim-clang
+let g:clang_c_options = '-std=gnu11'
+let g:clang_cpp_options = '-std=c++ -stdlib=libc++'
+let g:clang_check_syntax_auto = 1
+let g:clang_vim_exec = 'nvim'
+
+" Highlight trailing whitespaces
 :highlight ExtraWhitespace ctermbg=red guibg=red
 autocmd ColorScheme * highlight ExtraWhitespace ctermbg=red
 au InsertEnter * match ExtraWhiteSpace /\s\+\%#\@<!$/
@@ -67,25 +96,21 @@ nmap . .`[
 map j gj
 map k gk
 map <c-j> :tjump 
-map <c-h> :call SwitchSourceHeader() <CR>
+map <c-h> :A <CR>
 map <F1> :bprev <CR>
 map <F2> :bnext <CR>
 
 map <s-c-F> :vimgrep <C-R><C-W>
-map <s-c-h> :cscope find c <C-R><C-W><CR>
-map <F4> :cscope find g <C-R><C-W><CR>
-map <F9> :syntax match Eol "\r$" conceal cchar= <CR>
 map <F11> :tjump <C-R><C-W> <CR>
 map <F12> <C-]>
-
 
 " Generate new ctags for project
 map <F7> :!ctags -R --language-force=java --extra=+f --exclude=*.class .<CR>
 map <F8> :!ctags -R --c++-kinds=+p --fields=+iaS --extra=+q+f .<CR>
 
 " Change between indentation settings
-map <C-F9> :set tabstop=4<CR>:set shiftwidth=4<CR>:set expandtab<CR>:set cinoptions=<CR>
-map <C-F10> :set tabstop=2<CR>:set shiftwidth=2<CR>:set expandtab<CR>:set cinoptions=<CR>
+map <F9> :set tabstop=4<CR>:set shiftwidth=4<CR>:set expandtab<CR>:set cinoptions=<CR>
+map <F10> :set tabstop=2<CR>:set shiftwidth=2<CR>:set expandtab<CR>:set cinoptions=<CR>
 
 " Magically fold from search result
 nnoremap \z :setlocal foldexpr=(getline(v:lnum)=~@/)?0:(getline(v:lnum-1)=~@/)\\|\\|(getline(v:lnum+1)=~@/)?1:2 foldmethod=expr foldlevel=0 foldcolumn=2<CR>
@@ -105,8 +130,6 @@ function! SwitchSourceHeader()
     execute "tjump ".file
   endif
 endfunction
-
-set mouse=a
 
 " Fix cursor
 let &t_SI = "\<Esc>[6 q"
