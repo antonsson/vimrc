@@ -1,8 +1,5 @@
-filetype off                  " required
+filetype off
 
-" Vundle
-" run :PluginInstall or vim +PluginInstall +qall
-"
 " set the runtime path to include Vundle and initialize
 set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
@@ -12,12 +9,13 @@ Plugin 'gmarik/Vundle.vim'
 Plugin 'tpope/vim-fugitive'
 Plugin 'kien/ctrlp.vim'
 Plugin 'vim-scripts/a.vim'
-Plugin 'hsanson/vim-android'
+Plugin 'rhysd/vim-clang-format'
+Plugin 'udalov/kotlin-vim'
+Plugin 'leafgarland/typescript-vim'
 Plugin 'artur-shaik/vim-javacomplete2'
-Plugin 'justmao945/vim-clang'
-
-"Plugin 'Valloric/YouCompleteMe'
-"Plugin 'rdnetto/YCM-Generator'
+Plugin 'hsanson/vim-android'
+Plugin 'Valloric/YouCompleteMe'
+Plugin 'rdnetto/YCM-Generator'
 
 " All of your Plugins must be added before the following line
 call vundle#end()
@@ -27,22 +25,27 @@ let mapleader = ','
 color molokai
 syntax on
 
+" General stuff
 set nocompatible
 set laststatus=2
 set mouse=a
+set backspace=2
+set smartcase
+set ruler
+set scrolloff=4
+set conceallevel=0
+set concealcursor=nivc
 
 " Indentation
 set tabstop=4
 set shiftwidth=4
 set expandtab
 set cindent
+
 " Search
 set hlsearch
 set incsearch
 set ignorecase
-
-set conceallevel=3
-set concealcursor=nivc
 
 " Undo
 set undodir=~/.vim/undodir
@@ -50,18 +53,25 @@ set undofile
 set undolevels=1000
 set undoreload=10000
 
-set backspace=2
-set smartcase
-set ruler
-set scrolloff=4
+" Swaps
 set backupdir=~/.vim/swaps,$TMP
 set directory=~/.vim/swaps,$TMP
 
 " For better completion
-set completeopt=longest,menuone,preview
+set completeopt=longest,menuone
+inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
 
-" javacomplete2
+" Highlight trailing whitespaces
+:highlight ExtraWhitespace ctermbg=red guibg=red
+autocmd ColorScheme * highlight ExtraWhitespace ctermbg=red
+autocmd InsertEnter * match ExtraWhiteSpace /\s\+\%#\@<!$/
+autocmd InsertLeave * match ExtraWhiteSpace /\s\+$/
+
+" Java
 autocmd FileType java setlocal omnifunc=javacomplete#Complete
+
+" CPP
+autocmd FileType cpp setlocal shiftwidth=2 tabstop=2
 
 " Makefiles should use tabulators
 autocmd FileType make setlocal shiftwidth=4 tabstop=4 noexpandtab
@@ -69,40 +79,28 @@ autocmd FileType make setlocal shiftwidth=4 tabstop=4 noexpandtab
 " Logcat syntax files
 autocmd BufRead,BufNewFile *.logcat setfiletype logcat
 
-
 " vim-android
 let g:android_sdk_path = $HOME."/sdks/android-sdk-linux"
 
 " YouCompleteMe
-"highlight YcmErrorLine cterm=none
-"highlight YcmErrorSection cterm=none
-"highlight YcmWarningLine cterm=none
-"highlight YcmWarningSection cterm=none
-
-" vim-clang
-let g:clang_c_options = '-std=gnu11'
-let g:clang_cpp_options = '-std=c++ -stdlib=libc++'
-let g:clang_check_syntax_auto = 1
-let g:clang_vim_exec = 'nvim'
-
-" Highlight trailing whitespaces
-:highlight ExtraWhitespace ctermbg=red guibg=red
-autocmd ColorScheme * highlight ExtraWhitespace ctermbg=red
-au InsertEnter * match ExtraWhiteSpace /\s\+\%#\@<!$/
-au InsertLeave * match ExtraWhiteSpace /\s\+$/
+let g:ycm_log_level = 'debug'
+let g:ycm_collect_identifiers_from_tags_files = 1
+let g:ycm_confirm_extra_conf = 0
+highlight YcmWarningLine cterm=none
+highlight YcmWarningSection cterm=none
 
 " Navigation
 nmap . .`[
-map j gj
-map k gk
-map <c-j> :tjump 
-map <c-h> :A <CR>
-map <F1> :bprev <CR>
-map <F2> :bnext <CR>
+nmap j gj
+nmap k gk
+nmap <c-j> :tjump 
+nmap <c-h> :SwitchSourceHeader <CR>
 
-map <s-c-F> :vimgrep <C-R><C-W>
-map <F11> :tjump <C-R><C-W> <CR>
-map <F12> <C-]>
+nmap <F3> :cclose <CR> :YcmCompleter FixIt <CR>
+nmap <F4> :YcmCompleter GoTo <CR>
+
+nmap <F11> :tjump <C-R><C-W> <CR>
+nmap <F12> <C-]>
 
 " Generate new ctags for project
 map <F7> :!ctags -R --language-force=java --extra=+f --exclude=*.class .<CR>
@@ -131,19 +129,10 @@ function! SwitchSourceHeader()
   endif
 endfunction
 
-" Fix cursor
-let &t_SI = "\<Esc>[6 q"
-"let &t_SR = "\<Esc>[4 q"
-let &t_EI = "\<Esc>[2 q"
-
-if &term =~ "xterm\\|rxvt"
-  " use an orange cursor in insert mode
-  let &t_SI = "\<Esc>]12;orange\x7"
-  " use a red cursor otherwise
-  let &t_EI = "\<Esc>]12;white\x7"
-  silent !echo -ne "\033]12;white\007"
-  " reset cursor when vim exits
-  autocmd VimLeave * silent !echo -ne "\033]112\007"
-  " use \003]12;gray\007 for gnome-terminal
-endif
+" clang-format
+let g:clang_format#detect_style_file = 1
+let g:clang_format#style_options = {
+            \ "Standard" : "C++11"}
+autocmd FileType c,cpp,objc nnoremap <buffer><Leader>cf :<C-u>ClangFormat<CR>
+autocmd FileType c,cpp,objc vnoremap <buffer><Leader>cf :ClangFormat<CR>
 
