@@ -13,9 +13,10 @@ Plugin 'rhysd/vim-clang-format'
 Plugin 'udalov/kotlin-vim'
 Plugin 'leafgarland/typescript-vim'
 Plugin 'artur-shaik/vim-javacomplete2'
-Plugin 'hsanson/vim-android'
 Plugin 'Valloric/YouCompleteMe'
 Plugin 'rdnetto/YCM-Generator'
+Plugin 'maksimr/vim-jsbeautify'
+Plugin 'editorconfig/editorconfig-vim'
 
 " All of your Plugins must be added before the following line
 call vundle#end()
@@ -34,7 +35,6 @@ set smartcase
 set ruler
 set scrolloff=4
 set conceallevel=0
-set concealcursor=nivc
 
 " Indentation
 set tabstop=4
@@ -58,14 +58,22 @@ set backupdir=~/.vim/swaps,$TMP
 set directory=~/.vim/swaps,$TMP
 
 " For better completion
-set completeopt=longest,menuone
+set completeopt=longest,menuone,preview
 inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
 
 " Highlight trailing whitespaces
-:highlight ExtraWhitespace ctermbg=red guibg=red
+highlight ExtraWhitespace ctermbg=red guibg=red
 autocmd ColorScheme * highlight ExtraWhitespace ctermbg=red
 autocmd InsertEnter * match ExtraWhiteSpace /\s\+\%#\@<!$/
 autocmd InsertLeave * match ExtraWhiteSpace /\s\+$/
+
+" EditorConfig
+let g:EditorConfig_exclude_patterns = ['fugitive://.*']
+autocmd FileType javascript noremap <buffer><Leader>cf :call JsBeautify()<cr>
+autocmd FileType json noremap <buffer><Leader>cf :call JsonBeautify()<cr>
+autocmd FileType jsx noremap <buffer><Leader>cf :call JsxBeautify()<cr>
+autocmd FileType html noremap <buffer><Leader>cf :call HtmlBeautify()<cr>
+autocmd FileType css noremap <buffer><Leader>cf :call CSSBeautify()<cr>
 
 " Java
 autocmd FileType java setlocal omnifunc=javacomplete#Complete
@@ -86,6 +94,8 @@ let g:android_sdk_path = $HOME."/sdks/android-sdk-linux"
 let g:ycm_log_level = 'debug'
 let g:ycm_collect_identifiers_from_tags_files = 1
 let g:ycm_confirm_extra_conf = 0
+let g:ycm_autoclose_preview_window_after_insertion = 1
+let g:ycm_add_preview_to_completeopt = 1
 highlight YcmWarningLine cterm=none
 highlight YcmWarningSection cterm=none
 
@@ -94,7 +104,7 @@ nmap . .`[
 nmap j gj
 nmap k gk
 nmap <c-j> :tjump 
-nmap <c-h> :SwitchSourceHeader <CR>
+nmap <c-h> :call SwitchSourceHeader() <CR>
 
 nmap <F3> :cclose <CR> :YcmCompleter FixIt <CR>
 nmap <F4> :YcmCompleter GoTo <CR>
@@ -135,4 +145,5 @@ let g:clang_format#style_options = {
             \ "Standard" : "C++11"}
 autocmd FileType c,cpp,objc nnoremap <buffer><Leader>cf :<C-u>ClangFormat<CR>
 autocmd FileType c,cpp,objc vnoremap <buffer><Leader>cf :ClangFormat<CR>
+autocmd FileType typescript noremap <buffer><Leader>cf :ClangFormat<cr>
 
