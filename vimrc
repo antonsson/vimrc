@@ -17,6 +17,7 @@ Plugin 'Valloric/YouCompleteMe'
 Plugin 'rdnetto/YCM-Generator'
 Plugin 'maksimr/vim-jsbeautify'
 Plugin 'editorconfig/editorconfig-vim'
+Plugin 'Shougo/deoplete.nvim'
 
 " All of your Plugins must be added before the following line
 call vundle#end()
@@ -57,9 +58,8 @@ set undoreload=10000
 set backupdir=~/.vim/swaps,$TMP
 set directory=~/.vim/swaps,$TMP
 
-" For better completion
-set completeopt=longest,menuone,preview
-inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
+" deoplete startup
+let g:deoplete#enable_at_startup = 1
 
 " Highlight trailing whitespaces
 highlight ExtraWhitespace ctermbg=red guibg=red
