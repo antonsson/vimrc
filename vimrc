@@ -5,19 +5,19 @@ set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
 
 " let Vundle manage Vundle, required
-Plugin 'gmarik/Vundle.vim'
-Plugin 'tpope/vim-fugitive'
-Plugin 'kien/ctrlp.vim'
-Plugin 'vim-scripts/a.vim'
-Plugin 'rhysd/vim-clang-format'
-Plugin 'udalov/kotlin-vim'
-Plugin 'leafgarland/typescript-vim'
-Plugin 'artur-shaik/vim-javacomplete2'
-Plugin 'Valloric/YouCompleteMe'
-Plugin 'rdnetto/YCM-Generator'
-Plugin 'maksimr/vim-jsbeautify'
-Plugin 'editorconfig/editorconfig-vim'
 Plugin 'Shougo/deoplete.nvim'
+Plugin 'Valloric/YouCompleteMe'
+Plugin 'airblade/vim-gitgutter'
+Plugin 'gmarik/Vundle.vim'
+Plugin 'junegunn/fzf.vim'
+Plugin 'kien/ctrlp.vim'
+Plugin 'leafgarland/typescript-vim'
+Plugin 'maksimr/vim-jsbeautify'
+Plugin 'rhysd/vim-clang-format'
+Plugin 'tpope/vim-commentary'
+Plugin 'tpope/vim-eunuch'
+Plugin 'tpope/vim-fugitive'
+Plugin 'udalov/kotlin-vim'
 
 " All of your Plugins must be added before the following line
 call vundle#end()
@@ -60,6 +60,11 @@ set directory=~/.vim/swaps,$TMP
 
 " deoplete startup
 let g:deoplete#enable_at_startup = 1
+let g:deoplete#omni_patterns = {}
+let g:deoplete#omni_patterns.java = '[^. *\t]\.\w*'
+let g:deoplete#sources = {}
+let g:deoplete#sources._ = []
+let g:deoplete#file#enable_buffer_path = 1
 
 " Highlight trailing whitespaces
 highlight ExtraWhitespace ctermbg=red guibg=red
@@ -68,15 +73,11 @@ autocmd InsertEnter * match ExtraWhiteSpace /\s\+\%#\@<!$/
 autocmd InsertLeave * match ExtraWhiteSpace /\s\+$/
 
 " EditorConfig
-let g:EditorConfig_exclude_patterns = ['fugitive://.*']
 autocmd FileType javascript noremap <buffer><Leader>cf :call JsBeautify()<cr>
 autocmd FileType json noremap <buffer><Leader>cf :call JsonBeautify()<cr>
 autocmd FileType jsx noremap <buffer><Leader>cf :call JsxBeautify()<cr>
 autocmd FileType html noremap <buffer><Leader>cf :call HtmlBeautify()<cr>
 autocmd FileType css noremap <buffer><Leader>cf :call CSSBeautify()<cr>
-
-" Java
-autocmd FileType java setlocal omnifunc=javacomplete#Complete
 
 " CPP
 autocmd FileType cpp setlocal shiftwidth=2 tabstop=2
@@ -87,8 +88,8 @@ autocmd FileType make setlocal shiftwidth=4 tabstop=4 noexpandtab
 " Logcat syntax files
 autocmd BufRead,BufNewFile *.logcat setfiletype logcat
 
-" vim-android
-let g:android_sdk_path = $HOME."/sdks/android-sdk-linux"
+" Gitgutter
+nmap <Leader>u :GitGutterToggle<cr>
 
 " YouCompleteMe
 let g:ycm_log_level = 'debug'
@@ -96,29 +97,33 @@ let g:ycm_collect_identifiers_from_tags_files = 1
 let g:ycm_confirm_extra_conf = 0
 let g:ycm_autoclose_preview_window_after_insertion = 1
 let g:ycm_add_preview_to_completeopt = 1
+let g:ycm_global_ycm_extra_conf = '~/.vim/.ycm_extra_conf.py'
 highlight YcmWarningLine cterm=none
 highlight YcmWarningSection cterm=none
+nmap <Leader>g :YcmCompleter GoTo <cr>
+nmap <F4> :YcmCompleter GoTo <CR>
 
 " Navigation
 nmap . .`[
 nmap j gj
 nmap k gk
 nmap <c-j> :tjump 
+nmap <Leader>j :tjump 
 nmap <c-h> :call SwitchSourceHeader() <CR>
-
 nmap <F3> :cclose <CR> :YcmCompleter FixIt <CR>
-nmap <F4> :YcmCompleter GoTo <CR>
-
 nmap <F11> :tjump <C-R><C-W> <CR>
 nmap <F12> <C-]>
 
 " Generate new ctags for project
-map <F7> :!ctags -R --language-force=java --extra=+f --exclude=*.class .<CR>
-map <F8> :!ctags -R --c++-kinds=+p --fields=+iaS --extra=+q+f .<CR>
+nmap <F7> :!ctags -R --language-force=java --extra=+f --exclude=*.class .<CR>
+nmap <F8> :!ctags -R --c++-kinds=+p --fields=+ilaS --extra=+q+f .<CR>
 
 " Change between indentation settings
-map <F9> :set tabstop=4<CR>:set shiftwidth=4<CR>:set expandtab<CR>:set cinoptions=<CR>
-map <F10> :set tabstop=2<CR>:set shiftwidth=2<CR>:set expandtab<CR>:set cinoptions=<CR>
+nmap <F9> :set tabstop=4<CR>:set shiftwidth=4<CR>:set expandtab<CR>:set cinoptions=<CR>
+nmap <F10> :set tabstop=2<CR>:set shiftwidth=2<CR>:set expandtab<CR>:set cinoptions=<CR>
+
+" terminal remaps
+tnoremap <Esc> <C-\><C-n>
 
 " Magically fold from search result
 nnoremap \z :setlocal foldexpr=(getline(v:lnum)=~@/)?0:(getline(v:lnum-1)=~@/)\\|\\|(getline(v:lnum+1)=~@/)?1:2 foldmethod=expr foldlevel=0 foldcolumn=2<CR>
