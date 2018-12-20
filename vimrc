@@ -5,15 +5,18 @@ set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
 
 " let Vundle manage Vundle, required
+Plugin 'gmarik/Vundle.vim'
+
 Plugin 'Shougo/deoplete.nvim'
 Plugin 'Valloric/YouCompleteMe'
 Plugin 'airblade/vim-gitgutter'
-Plugin 'gmarik/Vundle.vim'
 Plugin 'junegunn/fzf.vim'
 Plugin 'kien/ctrlp.vim'
 Plugin 'leafgarland/typescript-vim'
 Plugin 'maksimr/vim-jsbeautify'
+Plugin 'nvie/vim-flake8'
 Plugin 'rhysd/vim-clang-format'
+Plugin 'tell-k/vim-autopep8'
 Plugin 'tpope/vim-commentary'
 Plugin 'tpope/vim-eunuch'
 Plugin 'tpope/vim-fugitive'
@@ -79,6 +82,10 @@ autocmd FileType jsx noremap <buffer><Leader>cf :call JsxBeautify()<cr>
 autocmd FileType html noremap <buffer><Leader>cf :call HtmlBeautify()<cr>
 autocmd FileType css noremap <buffer><Leader>cf :call CSSBeautify()<cr>
 
+" Python - autopep8
+let g:autopep8_disable_show_diff=1
+autocmd FileType python noremap <buffer><Leader>cf :call Autopep8()<cr>
+
 " CPP
 autocmd FileType cpp setlocal shiftwidth=2 tabstop=2
 
@@ -115,8 +122,8 @@ nmap <F11> :tjump <C-R><C-W> <CR>
 nmap <F12> <C-]>
 
 " Generate new ctags for project
-nmap <F7> :!ctags -R --language-force=java --extra=+f --exclude=*.class .<CR>
-nmap <F8> :!ctags -R --c++-kinds=+p --fields=+ilaS --extra=+q+f .<CR>
+nmap <F8> :!ctags -R --c++-kinds=+p --fields=+ilaS --extras=+q+f .<CR>
+nmap <C-F8> :!ctags -R --language-force=java --extras=+f --exclude=*.class .<CR>
 
 " Change between indentation settings
 nmap <F9> :set tabstop=4<CR>:set shiftwidth=4<CR>:set expandtab<CR>:set cinoptions=<CR>
