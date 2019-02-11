@@ -6,10 +6,12 @@ call vundle#begin()
 
 " let Vundle manage Vundle, required
 Plugin 'gmarik/Vundle.vim'
-
 Plugin 'Shougo/deoplete.nvim'
 Plugin 'Valloric/YouCompleteMe'
 Plugin 'airblade/vim-gitgutter'
+Plugin 'bkad/CamelCaseMotion'
+Plugin 'dart-lang/dart-vim-plugin'
+Plugin 'ruanyl/vim-fixmyjs'
 Plugin 'junegunn/fzf.vim'
 Plugin 'kien/ctrlp.vim'
 Plugin 'leafgarland/typescript-vim'
@@ -58,8 +60,8 @@ set undolevels=1000
 set undoreload=10000
 
 " Swaps
-set backupdir=~/.vim/swaps,$TMP
-set directory=~/.vim/swaps,$TMP
+set backupdir=~/.vim/swapfiles
+set directory=~/.vim/swapfiles
 
 " deoplete startup
 let g:deoplete#enable_at_startup = 1
@@ -150,6 +152,9 @@ function! SwitchSourceHeader()
     execute "tjump ".file
   endif
 endfunction
+
+" CamelCaseMotion
+call camelcasemotion#CreateMotionMappings('<leader>')
 
 " clang-format
 let g:clang_format#detect_style_file = 1
