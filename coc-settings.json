@@ -1,0 +1,34 @@
+{
+    "diagnostic.virtualText": true,
+    "codeLens.enable": false,
+
+    "languageserver": {
+        "clangd": {
+            "command": "clangd",
+            "rootPatterns": ["compile_flags.txt", "compile_commands.json", ".vim/", ".git/", ".hg/"],
+            "filetypes": ["c", "cpp", "objc", "objcpp"]
+        },
+        "dart": {
+            "command": "dart_language_server",
+            "args": [],
+            "filetypes": ["dart"],
+            "initializationOptions": {},
+            "settings": {
+                "dart": {
+                    "validation": {},
+                    "completion": {}
+                }
+            }
+        },
+        "bash": {
+            "command": "bash-language-server",
+            "args": ["start"],
+            "filetypes": ["sh"],
+            "ignoredRootPaths": ["~"]
+        }
+    },
+    "list.insertMappings": {
+        "<C-n>": "feedkeys:\\<Down>",
+        "<C-p>": "feedkeys:\\<Up>"
+    }
+}

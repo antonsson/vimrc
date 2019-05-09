@@ -6,21 +6,15 @@ call vundle#begin()
 
 " let Vundle manage Vundle, required
 Plugin 'gmarik/Vundle.vim'
-Plugin 'Shougo/deoplete.nvim'
-Plugin 'Valloric/YouCompleteMe'
-Plugin 'airblade/vim-gitgutter'
 Plugin 'bkad/CamelCaseMotion'
 Plugin 'dart-lang/dart-vim-plugin'
-Plugin 'ruanyl/vim-fixmyjs'
 Plugin 'junegunn/fzf.vim'
 Plugin 'kien/ctrlp.vim'
 Plugin 'leafgarland/typescript-vim'
-Plugin 'maksimr/vim-jsbeautify'
-Plugin 'nvie/vim-flake8'
+Plugin 'ludovicchabant/vim-gutentags'
+Plugin 'neoclide/coc.nvim'
+Plugin 'itchyny/lightline.vim'
 Plugin 'rhysd/vim-clang-format'
-Plugin 'tell-k/vim-autopep8'
-Plugin 'tpope/vim-commentary'
-Plugin 'tpope/vim-eunuch'
 Plugin 'tpope/vim-fugitive'
 Plugin 'udalov/kotlin-vim'
 
@@ -63,13 +57,109 @@ set undoreload=10000
 set backupdir=~/.vim/swapfiles
 set directory=~/.vim/swapfiles
 
-" deoplete startup
-let g:deoplete#enable_at_startup = 1
-let g:deoplete#omni_patterns = {}
-let g:deoplete#omni_patterns.java = '[^. *\t]\.\w*'
-let g:deoplete#sources = {}
-let g:deoplete#sources._ = []
-let g:deoplete#file#enable_buffer_path = 1
+" Default statusline
+set statusline=%<%F\ %h%m%r%=%-14.(%l,%c%V%)\ %P
+
+" Coc
+set hidden
+" Better display for messages
+set cmdheight=2
+" Smaller updatetime for CursorHold & CursorHoldI
+set updatetime=300
+" don't give |ins-completion-menu| messages.
+set shortmess+=c
+" always show signcolumns
+"set signcolumn=yes
+" Use tab for trigger completion with characters ahead and navigate.
+" Use command ':verbose imap <tab>' to make sure tab is not mapped by other plugin.
+inoremap <silent><expr> <TAB>
+      \ pumvisible() ? "\<C-n>" :
+      \ <SID>check_back_space() ? "\<TAB>" :
+      \ coc#refresh()
+inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+
+function! s:check_back_space() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
+
+inoremap <silent><expr> <c-space> coc#refresh()
+
+" Remap keys for gotos
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gr <Plug>(coc-references)
+
+" Use K to show documentation in preview window
+nnoremap <silent> K :call <SID>show_documentation()<CR>
+
+function! s:show_documentation()
+  if (index(['vim','help'], &filetype) >= 0)
+    execute 'h '.expand('<cword>')
+  else
+    call CocAction('doHover')
+  endif
+endfunction
+
+" Highlight symbol under cursor on CursorHold
+autocmd CursorHold * silent call CocActionAsync('highlight')
+
+" Remap for rename current word
+nmap <leader>rn <Plug>(coc-rename)
+
+" Remap for format selected region
+xmap <leader>f  <Plug>(coc-format-selected)
+nmap <leader>f  <Plug>(coc-format-selected)
+
+augroup mygroup
+  autocmd!
+  " Setup formatexpr specified filetype(s).
+  autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
+  " Update signature help on jump placeholder
+  autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
+augroup end
+
+" Remap for do codeAction of selected region, ex: `<leader>aap` for current paragraph
+xmap <leader>a  <Plug>(coc-codeaction-selected)
+nmap <leader>a  <Plug>(coc-codeaction-selected)
+
+" Remap for do codeAction of current line
+nmap <leader>ac  <Plug>(coc-codeaction)
+" Fix autofix problem of current line
+nmap <leader>qf  <Plug>(coc-fix-current)
+
+" Use `:Format` to format current buffer
+command! -nargs=0 Format :call CocAction('format')
+
+" Use `:Fold` to fold current buffer
+command! -nargs=? Fold :call CocAction('fold', <f-args>)
+
+command! -nargs=0 Prettier :CocCommand prettier.formatFile
+
+" Using CocList
+" Show all diagnostics
+nnoremap <silent> <space>a  :<C-u>CocList diagnostics<cr>
+" Manage extensions
+nnoremap <silent> <space>e  :<C-u>CocList extensions<cr>
+" Show commands
+nnoremap <silent> <space>c  :<C-u>CocList commands<cr>
+" Find symbol of current document
+nnoremap <silent> <space>o  :<C-u>CocList outline<cr>
+" Search workspace symbols
+nnoremap <silent> <space>s  :<C-u>CocList -I symbols<cr>
+" Do default action for next item.
+nnoremap <silent> <space>j  :<C-u>CocNext<CR>
+" Do default action for previous item.
+nnoremap <silent> <space>k  :<C-u>CocPrev<CR>
+" Resume latest coc list
+nnoremap <silent> <space>p  :<C-u>CocListResume<CR>
+
+" Files from cwd
+nnoremap <silent> <space>f  :<C-u>CocList files<Cr>
+nnoremap <silent> <leader>j  :<C-u>CocList files<Cr>
+nnoremap <silent> <space>b  :<C-u>CocList buffers<Cr>
+" Coc - end
 
 " Highlight trailing whitespaces
 highlight ExtraWhitespace ctermbg=red guibg=red
@@ -78,11 +168,34 @@ autocmd InsertEnter * match ExtraWhiteSpace /\s\+\%#\@<!$/
 autocmd InsertLeave * match ExtraWhiteSpace /\s\+$/
 
 " EditorConfig
-autocmd FileType javascript noremap <buffer><Leader>cf :call JsBeautify()<cr>
-autocmd FileType json noremap <buffer><Leader>cf :call JsonBeautify()<cr>
-autocmd FileType jsx noremap <buffer><Leader>cf :call JsxBeautify()<cr>
-autocmd FileType html noremap <buffer><Leader>cf :call HtmlBeautify()<cr>
-autocmd FileType css noremap <buffer><Leader>cf :call CSSBeautify()<cr>
+autocmd FileType javascript,json,html,css noremap <buffer><Leader>cf :Prettier <cr>
+
+" Gutentags
+let gutentags_ctags_extra_args = ['--extras=+f+q']
+set statusline+=%{gutentags#statusline()}
+
+" Lightline
+set noshowmode
+let g:lightline = {
+      \ 'colorscheme': 'seoul256',
+      \ 'active': {
+      \   'left': [ [ 'mode', 'paste' ],
+      \             [ 'gitbranch', 'readonly', 'relativepath', 'modified', 'gutentags' ] ]
+      \ },
+      \ 'inactive': {
+      \   'left': [ [ 'relativepath' ],
+      \             [ ] ]
+      \ },
+      \ 'component_function': {
+      \   'gitbranch': 'fugitive#head',
+      \   'gutentags': 'gutentags#statusline'
+      \ },
+      \ }
+augroup MyGutentagsStatusLineRefresher
+    autocmd!
+    autocmd User GutentagsUpdating call lightline#update()
+    autocmd User GutentagsUpdated call lightline#update()
+augroup END
 
 " Python - autopep8
 let g:autopep8_disable_show_diff=1
@@ -100,28 +213,14 @@ autocmd BufRead,BufNewFile *.logcat setfiletype logcat
 " Gitgutter
 nmap <Leader>u :GitGutterToggle<cr>
 
-" YouCompleteMe
-let g:ycm_log_level = 'debug'
-let g:ycm_collect_identifiers_from_tags_files = 1
-let g:ycm_confirm_extra_conf = 0
-let g:ycm_autoclose_preview_window_after_insertion = 1
-let g:ycm_add_preview_to_completeopt = 1
-let g:ycm_global_ycm_extra_conf = '~/.vim/.ycm_extra_conf.py'
-highlight YcmWarningLine cterm=none
-highlight YcmWarningSection cterm=none
-nmap <Leader>g :YcmCompleter GoTo <cr>
-nmap <F4> :YcmCompleter GoTo <CR>
-
 " Navigation
 nmap . .`[
 nmap j gj
 nmap k gk
 nmap <c-j> :tjump 
-nmap <Leader>j :tjump 
 nmap <c-h> :call SwitchSourceHeader() <CR>
 nmap <F3> :cclose <CR> :YcmCompleter FixIt <CR>
-nmap <F11> :tjump <C-R><C-W> <CR>
-nmap <F12> <C-]>
+nmap <F12> :tjump <C-R><C-W> <CR>
 
 " Generate new ctags for project
 nmap <F8> :!ctags -R --c++-kinds=+p --fields=+ilaS --extras=+q+f .<CR>
